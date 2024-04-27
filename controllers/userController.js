@@ -56,18 +56,16 @@ exports.update = async (req, res) => {
   try {
     const id = req.params.id;
     const {name,email,scheduledAt} = req.body
-    if(!name || !email || !scheduledAt) {
+    if(!name && !email && !scheduledAt) {
       return res.status(400).json({"message":"name or email or scheduledAt is required"});
     }
     const user = await User.findById(id);
-    const newData = {
-      name:name || user.name,
-      email:email || user.email,
-      scheduledAt:scheduledAt || user.scheduledAt
-    }
     if(user) {
-      // check 
-      const updatedUser = await User.findByIdAndUpdate(id,newData)
+      // check
+      user.name = name || user.name
+      user.email = email || user.email
+      user.scheduledAt = scheduledAt || user.scheduledAt
+      const updatedUser = await user.save();
       if(scheduledAt) {
         const scheduledTime = new Date(scheduledAt);
         const delay = Math.max(scheduledTime - Date.now(), 0);
